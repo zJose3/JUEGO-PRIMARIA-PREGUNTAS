@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RyoGames 🚀 | Exploración Sonora</title>
+    <style>
+        :root {
+            --bg-color: #0b071e;
+            --card-bg: rgba(23, 15, 48, 0.9);
+            --neon-blue: #00f0ff;
+            --neon-purple: #7000ff;
+            --neon-pink: #ff007f;
+            --correct: #00ff88;
+            --wrong: #ff2a6d;
+            --text: #f0f4f8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1a0b36 0%, #060212 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .space-decor {
+            position: absolute;
+            font-size: 2em;
+            opacity: 0.15;
+            animation: float 6s ease-in-out infinite alternate;
+            user-select: none;
+            pointer-events: none;
+        }
+        .decor-1 { top: 8%; left: 6%; }
+        .decor-2 { top: 12%; right: 8%; animation-delay: 1.5s; }
+        .decor-3 { bottom: 10%; left: 10%; animation-delay: 3s; }
+        .decor-4 { bottom: 8%; right: 6%; animation-delay: 4.5s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-20px); }
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 750px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(112, 0, 255, 0.35), inset 0 0 15px rgba(0, 240, 255, 0.1);
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 2.4em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-blue), #9d4edd, var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .brand-subtitle {
+            color: var(--neon-blue);
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .header-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            background: rgba(112, 0, 255, 0.2);
+            border: 1px solid var(--neon-purple);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .sound-collector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sound-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid var(--neon-purple);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sound-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .sound-card.active {
+            border-color: var(--correct);
+            background: rgba(0, 255, 136, 0.15);
+        }
+
+        .sound-card .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .sound-card .decibels {
+            font-size: 0.8em;
+            color: #f43f5e;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        .mixer-panel {
+            background: rgba(11, 7, 30, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            border: 1.5px solid rgba(112, 0, 255, 0.4);
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: var(--neon-blue);
+        }
+
+        .option-btn.correct {
+            background: rgba(0, 255, 136, 0.15) !important;
+            border-color: var(--correct) !important;
+            color: #80ffc4 !important;
+        }
+
+        .option-btn.wrong {
+            background: rgba(255, 42, 109, 0.15) !important;
+            border-color: var(--wrong) !important;
+            color: #ff99b8 !important;
+        }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(11, 7, 30, 0.9);
+            border: 1px solid var(--neon-blue);
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .results-screen {
+            text-align: center;
+        }
+
+        .score-big {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="space-decor decor-1">🎧</div>
+<div class="space-decor decor-2">📢</div>
+<div class="space-decor decor-3">🎵</div>
+<div class="space-decor decor-4">🏙️</div>
+
+<div class="game-container">
+    <div class="brand-header">
+        <h1 class="brand-title">⚡ RyoGames 🚀</h1>
+        <div class="brand-subtitle">Exploración Sonora: El Sonido de la Ciudad 🏙️</div>
+    </div>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen" style="text-align: center;">
+        <p style="margin-bottom: 20px; color: #cbd5e1; line-height: 1.5;">
+            ¡Bienvenido a la estación de exploración acústica! Recolecta ruidos urbanos, crea composiciones musicales experimentales y aprende a proteger tu salud del impacto de la contaminación auditiva.
+        </p>
+        <button class="action-btn" style="font-size: 1.1em; padding: 14px 32px;" onclick="startGame()">🎧 Iniciar Recolección Sonora</button>
+    </div>
+
+    <!-- Pantalla de Juego -->
+    <div id="quiz-screen" style="display: none;">
+        <div class="header-stats">
+            <span class="badge" id="stage-count">Etapa 1/3</span>
+            <span class="badge" id="score">⚡ Puntos: 0</span>
+        </div>
+
+        <h3 style="margin-bottom: 10px; color: var(--neon-blue);" id="stage-title">Muestra de Sonidos Urbano</h3>
+        <p id="stage-desc" style="font-size: 0.95em; color: #cbd5e1; margin-bottom: 15px;"></p>
+
+        <!-- Recolector de Sonidos -->
+        <div class="sound-collector" id="sound-collector"></div>
+
+        <!-- Panel Mezclador Sintetizado -->
+        <div class="mixer-panel">
+            <p style="font-weight: bold; margin-bottom: 8px;">Mezclador Acústico de Música Concreta</p>
+            <button class="action-btn" onclick="playComposition()">▶️ Reproducir Mezcla de la Ciudad</button>
+        </div>
+
+        <!-- Pregunta Teórica/Concientización -->
+        <div class="question-title" id="question-text" style="font-weight: 600; margin-top: 20px;"></div>
+        <div class="options-grid" id="options-container"></div>
+
+        <div class="feedback-box" id="feedback">
+            <strong>🔊 Análisis Acústico:</strong>
+            <p id="feedback-text" style="margin-top: 6px; line-height: 1.4;"></p>
+            <button class="action-btn" style="float: right;" onclick="nextStage()">Siguiente Etapa ➡️</button>
+        </div>
+    </div>
+
+    <!-- Pantalla Final -->
+    <div id="results-screen" class="results-screen" style="display: none;">
+        <h2>🎓 ¡Certificación Sonora Obtendida!</h2>
+        <p style="margin-top: 10px; color: #a5b4fc;">Puntuación de Concienciación Acústica:</p>
+        <div class="score-big" id="final-score">0 PTS</div>
+        <p id="final-comment" style="font-size: 1.05em; line-height: 1.5; margin-bottom: 20px;"></p>
+        <button class="action-btn" onclick="restartGame()">🔄 Crear Nueva Mezcla</button>
+    </div>
+</div>
+
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const stages = [
+        {
+            title: "Etapa 1: Tráfico y Transporte",
+            desc: "Selecciona los ruidos del transporte urbano para agregarlos a tu pista musical:",
+            sounds: [
+                { id: "claxon", name: "Bocina de Auto", icon: "🚗", db: "90 dB", freq: 440 },
+                { id: "motor", name: "Motor de Autobús", icon: "🚌", db: "85 dB", freq: 110 },
+                { id: "freno", name: "Frenado de Tren", icon: "🚆", db: "95 dB", freq: 880 }
+            ],
+            question: "1. La OMS establece que el ruido ambiental continuo no debe superar los 55 dB para evitar estrés. ¿Qué impacto provoca exponerse constantemente a los 90 dB del tráfico?",
+            options: [
+                "A) Pérdida auditiva progresiva, incremento del estrés e hipertensión.",
+                "B) Mejora de la capacidad de concentración auditiva.",
+                "C) No genera ningún impacto mientras te acostumbres al ruido."
+            ],
+            correct: 0,
+            explanation: "¡Correcto! Los sonidos sobre los 80-85 dB de forma prolongada dañan de forma irreversible las células ciliadas del oído interno, provocando estrés agudo y pérdida de audición."
+        },
+        {
+            title: "Etapa 2: Construcción y Obras",
+            desc: "Recoge frecuencias industriales para tu ensamble rítmico:",
+            sounds: [
+                { id: "taladro", name: "Martillo Neumático", icon: "🏗️", db: "110 dB", freq: 150 },
+                { id: "sierra", name: "Sierra Circular", icon: "⚙️", db: "105 dB", freq: 1200 }
+            ],
+            question: "2. Al transformar ruidos molestos en piezas musicales (movimiento llamado 'Música Concreta'), ¿qué propiedad física cambiamos para que sea agradable?",
+            options: [
+                "A) Eliminamos por completo los decibeles de la vibración.",
+                "B) Organizamos el ritmo, la frecuencia y la intensidad del sonido.",
+                "C) Cambiamos el sonido en luz visible."
+            ],
+            correct: 1,
+            explanation: "¡Así es! El ruido es una onda sonora desordenada. Al organizar sus parámetros físicos (ritmo, frecuencia, timbre y volumen) podemos convertir el ruido urbano en expresión artística."
+        },
+        {
+            title: "Etapa 3: Paisaje Urbano Cotidiano",
+            desc: "Agrega capas de ambiente de la vida nocturna e industrial:",
+            sounds: [
+                { id: "sirena", name: "Sirena de Ambulancia", icon: "🚑", db: "120 dB", freq: 650 },
+                { id: "multitud", name: "Murmullo Urbano", icon: "🏙️", db: "70 dB", freq: 300 }
+            ],
+            question: "3. ¿Cuál de las siguientes medidas es la más efectiva para reducir la contaminación auditiva urbana a escala ciudadana?",
+            options: [
+                "A) Obligar a todos a usar tapones para oídos las 24 horas.",
+                "B) Implementar barreras acústicas, pavimentos insonorizados y zonas verdes.",
+                "C) Prohibir el transporte de todo tipo en las ciudades."
+            ],
+            correct: 1,
+            explanation: "¡Excelente! La arquitectura urbana sostenible utiliza vegetación (que absorbe las ondas sonoras), barreras de insonorización y pavimentos especiales para amortiguar la contaminación acústica."
+        }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+    let selectedSounds = [];
+
+    function startGame() {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("quiz-screen").style.display = "block";
+        document.getElementById("results-screen").style.display = "none";
+        currentStage = 0;
+        score = 0;
+        selectedSounds = [];
+        loadStage();
+    }
+
+    function loadStage() {
+        const stage = stages[currentStage];
+        document.getElementById("stage-count").textContent = `Etapa ${currentStage + 1}/${stages.length}`;
+        document.getElementById("score").textContent = `⚡ Puntos: ${score}`;
+        document.getElementById("stage-title").textContent = stage.title;
+        document.getElementById("stage-desc").textContent = stage.desc;
+        document.getElementById("question-text").textContent = stage.question;
+        document.getElementById("feedback").classList.remove("show");
+
+        // Cargar tarjetas de sonidos
+        const collector = document.getElementById("sound-collector");
+        collector.innerHTML = "";
+        stage.sounds.forEach(snd => {
+            const card = document.createElement("div");
+            card.className = "sound-card";
+            card.innerHTML = `
+                <div class="icon">${snd.icon}</div>
+                <strong>${snd.name}</strong>
+                <div class="decibels">⚠️ ${snd.db}</div>
+            `;
+            card.onclick = () => {
+                card.classList.toggle("active");
+                playSound(snd.freq);
+                if (!selectedSounds.includes(snd)) {
+                    selectedSounds.push(snd);
+                }
+            };
+            collector.appendChild(card);
+        });
+
+        // Cargar opciones de respuesta
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+        stage.options.forEach((opt, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.textContent = opt;
+            btn.onclick = () => selectOption(idx);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function playSound(freq) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    function playComposition() {
+        if (selectedSounds.length === 0) {
+            alert("¡Haz clic en los ruidos urbanos de arriba para seleccionarlos antes de reproducir!");
+            return;
+        }
+        selectedSounds.forEach((snd, index) => {
+            setTimeout(() => {
+                playSound(snd.freq);
+            }, index * 250);
+        });
+    }
+
+    function selectOption(index) {
+        const stage = stages[currentStage];
+        const buttons = document.getElementById("options-container").children;
+
+        for (let btn of buttons) {
+            btn.disabled = true;
+        }
+
+        if (index === stage.correct) {
+            buttons[index].classList.add("correct");
+            score += 150;
+            document.getElementById("feedback-text").textContent = "🎉 ¡Excelente! " + stage.explanation;
+        } else {
+            buttons[index].classList.add("wrong");
+            buttons[stage.correct].classList.add("correct");
+            document.getElementById("feedback-text").textContent = "❌ ¡Atención! " + stage.explanation;
+        }
+
+        document.getElementById("score").textContent = `⚡ Puntos: ${score}`;
+        document.getElementById("feedback").classList.add("show");
+    }
+
+    function nextStage() {
+        currentStage++;
+        if (currentStage < stages.length) {
+            loadStage();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("results-screen").style.display = "block";
+        document.getElementById("final-score").textContent = `${score} PTS`;
+        
+        const comment = document.getElementById("final-comment");
+        if (score >= 400) {
+            comment.textContent = "🏆 ¡Maestro del Arte Acústico y Ecología Sonora! Lograste la máxima conciencia sobre la contaminación auditiva y la producción musical.";
+        } else {
+            comment.textContent = "🎧 ¡Buen trabajo de exploración! Sigue descubriendo cómo transformar el paisaje sonoro de tu ciudad.";
+        }
+    }
+
+    function restartGame() {
+        document.getElementById("start-screen").style.display = "block";
+        document.getElementById("results-screen").style.display = "none";
+    }
+</script>
+</body>
+</html>
